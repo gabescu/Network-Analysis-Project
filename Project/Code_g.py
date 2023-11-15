@@ -10,46 +10,25 @@ for row in inp:
     edge = [row[0], row[1], int(row[2])]
     edges.append(edge)
 inp.close()
-    
 
 darkweb = nx.DiGraph()
 darkweb.add_weighted_edges_from(edges)
 nr_nodes = len(darkweb.nodes)
-random_node = "wikipediak4by6wf"
 
-taken_down = {}
-infected_neighbors = {}
-defense = {}
-for node in darkweb:
-    if node == random_node:
-        taken_down[node] = True  
-        infected_neighbors = 0
-        defense = darkweb.degree[node]
-    else:
-        taken_down[node] = False
-        infected_neighbors = 0
-        defense = darkweb.degree[node]
-        
-nx.set_node_attributes(darkweb, taken_down, "taken_down")
-nx.set_node_attributes(darkweb, infected_neighbors, "infected_neighbors")
-nx.set_node_attributes(darkweb, defense, "defense")
+def attack_nodes(graph):
+    max_degree = max(dict(darkweb.out_degree()).values())
+    max_degree_node = list(dict(darkweb.out_degree()).keys())[max_degree]
+    darkweb.remove_node(max_degree_node)
 
-def break_nodes(graph):
-    x = 0
-    for node in graph:
-        if graph.nodes[node]["taken_down"] == True and graph.nodes[node]["infected_neighbors"] != len(graph[node]):
-            graph.nodes[list(darkweb[node].keys())[graph.nodes[node]["infected_neighbors"]]]["defense"] -= 1
-            if graph.nodes[list(darkweb[node].keys())[graph.nodes[node]["infected_neighbors"]]]["defense"] <= 0:
-                graph.nodes[list(darkweb[node].keys())[graph.nodes[node]["infected_neighbors"]]]["taken_down"] = True
-                graph.nodes[node]["infected_neighbors"] += 1
-            return
-            
-for _ in range(0, 100):
-    break_nodes(darkweb)
-    
+darkweb_undirected = darkweb.to_undirected()
+
+
 i = 0
-for node in darkweb:
-    if darkweb.nodes[node]["taken_down"] == True:
-        print(node)
-        i += 1
-        print(i)
+while i < 1830:
+    darkweb_undirected = darkweb.to_undirected()
+    attack_nodes(darkweb.degree())
+    i += 1
+    
+darkweb_undirected = darkweb.to_undirected()
+print(i, nx.number_connected_components(darkweb_undirected))
+    
