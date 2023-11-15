@@ -24,9 +24,9 @@ darkweb_undirected = darkweb.to_undirected()
 
 
 i = 0
-while i < 1830:
-    darkweb_undirected = darkweb.to_undirected()
+while nx.number_connected_components(darkweb_undirected) < 100:
     attack_nodes(darkweb.degree())
+    darkweb_undirected = darkweb.to_undirected()
     i += 1
     
 darkweb_undirected = darkweb.to_undirected()
