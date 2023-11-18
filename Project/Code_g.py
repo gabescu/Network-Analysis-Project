@@ -3,6 +3,7 @@ import random
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import operator
+import time
 
 
 #Reading
@@ -39,7 +40,7 @@ def max_pagerank(graph):
 
 #Function that removes the node
 def attack_nodes():
-    node_to_remove = max_betweenness_centrality(darkweb)
+    node_to_remove = max_pagerank(darkweb)
     darkweb.remove_node(node_to_remove)
 
 #Loop functions by steps times
@@ -47,10 +48,16 @@ print("Please select number of steps:")
 steps = int(input())
 darkweb_undirected = darkweb.to_undirected()
 i = 0
+start_time = time.time()
 while i < steps:
     attack_nodes()
     darkweb_undirected = darkweb.to_undirected()
+    largest_cc = max(nx.connected_components(darkweb_undirected), key=len)
+    print("The largest is: " + str(len(largest_cc)))
     i += 1
+end_time = time.time()
+full_time = end_time - start_time
+print("Time taken: " + str(full_time))
 
 #Print number of connected components in the graph
 print(nx.number_connected_components(darkweb_undirected))
