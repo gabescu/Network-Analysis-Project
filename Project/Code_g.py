@@ -43,6 +43,11 @@ def max_closeness_centrality(graph):
     max_c = max(closeness.items(), key=operator.itemgetter(1))[0]
     return max_c
 
+def eigenvector_centrality(graph):
+    eigenvector = nx.eigenvector_centrality(graph)
+    max_e = max(eigenvector.items(), key=operator.itemgetter(1))[0]
+    return max_e
+
 def attack_nodes_closeness():
     max_centrality_node = max_closeness_centrality(darkweb)
     darkweb.remove_node(max_centrality_node)
