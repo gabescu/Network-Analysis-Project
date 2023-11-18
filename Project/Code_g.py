@@ -20,10 +20,16 @@ darkweb.add_weighted_edges_from(edges)
 nr_nodes = len(darkweb.nodes)
 
 #Function that returnes the node with maximum betweenness centrality
-def max_betweenness_centrality(G):
-    betweenness = nx.betweenness_centrality(G)
+def max_betweenness_centrality(graph):
+    betweenness = nx.betweenness_centrality(graph)
     max_b = max(betweenness.items(), key=operator.itemgetter(1))[0]
     return max_b
+
+#Function that returns the node with maximum pagerank value
+def max_pagerank(graph):
+    pagerank = nx.pagerank(graph, max_iter = 1000, weight = "weight")
+    max_p = max(pagerank.items(), key=operator.itemgetter(1))[0]
+    return max_p
 
 #Function that removes the max degree node
 def attack_nodes():
