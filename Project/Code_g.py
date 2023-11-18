@@ -19,7 +19,7 @@ darkweb = nx.DiGraph()
 darkweb.add_weighted_edges_from(edges)
 nr_nodes = len(darkweb.nodes)
 
-#Function that returnes the node with maximum betweenness centrality
+#Function that returns the node with maximum betweenness centrality
 def max_betweenness_centrality(graph):
     betweenness = nx.betweenness_centrality(graph)
     max_b = max(betweenness.items(), key=operator.itemgetter(1))[0]
@@ -36,6 +36,12 @@ def max_pagerank(graph):
     pagerank = nx.pagerank(graph, max_iter = 1000, weight = "weight")
     max_p = max(pagerank.items(), key=operator.itemgetter(1))[0]
     return max_p
+
+#Function that returns the node with maximum eigenvector centrality
+def eigenvector_centrality(graph):
+    eigenvector = nx.eigenvector_centrality(graph)
+    max_e = max(eigenvector.items(), key=operator.itemgetter(1))[0]
+    return max_e
 
 #Function that removes the node
 def attack_nodes():
