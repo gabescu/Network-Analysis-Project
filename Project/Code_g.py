@@ -43,6 +43,15 @@ def attack_nodes():
     node_to_remove = max_pagerank(darkweb)
     darkweb.remove_node(node_to_remove)
 
+def max_closeness_centrality(graph):
+    closeness = nx.closeness_centrality(graph)
+    max_c = max(closeness.items(), key=operator.itemgetter(1))[0]
+    return max_c
+
+def attack_nodes_closeness():
+    max_centrality_node = max_closeness_centrality(darkweb)
+    darkweb.remove_node(max_centrality_node)
+
 #Loop functions by steps times
 print("Please select number of steps:")
 steps = int(input())
@@ -57,5 +66,5 @@ while i < steps:
     i += 1
 
 #Print number of connected components in the graph
-end_time = time.time()
-print(nx.number_connected_components(darkweb_undirected), f"Time of execution is {round(end_time - start_time, 3)} seconds")
+print(nx.number_connected_components(darkweb_undirected))
+    
