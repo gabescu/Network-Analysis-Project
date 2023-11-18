@@ -1,0 +1,46 @@
+﻿Cristina Avram  cria@itu.dk
+Gabriel Catalin Ionescu  gaio@itu.dk
+Cristian-Andrei Pricope  crpr@itu.dk
+Andreea-Larisa Rosu  rosu@itu.dk
+
+
+Network Analysis Project
+
+
+Network Description
+
+
+The network consists of 7178 nodes and 25104 edges, where each node represents an active website on the "dark web" (a .onion site), and each edge represents one dark web site linking to another. Each edge is directed, indicating which site has a link to another, and has a weight, which indicates how many pages on the linking domain link back to the domain being linked to. The nodes are named after the link of the site, so it is possible to trace back what site each node represents. There is also a research paper associated with this network, "Graph Theoretic Properties of the Darkweb" by V. Griffith, Y. Xu, C. Ratti (arXiv:1704.07525 [cs.CR]), which we plan to also reference in our research. 
+Links to network: http://santafe.edu/~aaronc/shared/darkweb_2017.zip
+https://icon.colorado.edu/#!/networks (“darkweb” network)
+Research question
+
+
+We plan to use this dataset in order to find out “What is the most efficient way to take down the network of dark web websites?” (for example, we could see this from the standpoint of legal authorities, which site is the best to investigate in order to discover as many hidden sites as possible, or which sites to take down to cause the most damage to illegal activities). Since we also know what each node represents, it may be possible to have a discussion on the results our research will produce. To find the answer to this question we make a number of assumptions:
+* The starting node of the infection is not random
+* Infected nodes are not randomly chosen
+* Nodes are harder to infect based on their degree
+* Nodes can recover from the infection
+* Nodes can recover from a previous attack in time
+
+
+Documentation?:
+
+* Max betweenness centrality with 5 steps (85.87164616584778 seconds):
+    - 7155 nodes
+    - 7088 nodes
+    - 6839 nodes
+    - 6824 nodes
+    - 6676 nodes
+* Max betweenness centrality with 10 steps (151.9013922214508 seconds):
+    - 7155 nodes
+    - 6839 nodes
+    - 7088 nodes
+    - 6824 nodes
+    - 6676 nodes
+    - 6672 nodes
+    - 6670 nodes
+    - 6301 nodes
+    - 5984 nodes
+    - 5975 nodes
+* 

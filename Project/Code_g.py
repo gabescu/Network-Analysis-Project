@@ -26,7 +26,7 @@ def max_betweenness_centrality(graph):
     max_b = max(betweenness.items(), key=operator.itemgetter(1))[0]
     return max_b
 
-#Function that returnes the node with maximum degree
+#Function that returns the node with maximum degree
 def degree_attack(graph):
     max_degree = max(dict(darkweb.out_degree()).values())
     max_degree_node = list(dict(darkweb.out_degree()).keys())[max_degree]
@@ -40,8 +40,8 @@ def max_pagerank(graph):
 
 #Function that removes the max degree node
 def attack_nodes():
-    max_centrality_node = max_betweenness_centrality(darkweb)
-    darkweb.remove_node(max_centrality_node)
+    node_to_remove = max_pagerank(darkweb)
+    darkweb.remove_node(node_to_remove)
 
 #Loop functions by steps times
 print("Please select number of steps:")
@@ -52,6 +52,8 @@ start_time = time.time()
 while i < steps:
     attack_nodes()
     darkweb_undirected = darkweb.to_undirected()
+    largest_cc = max(nx.connected_components(darkweb_undirected), key=len)
+    print("The largest is: " + str(len(largest_cc)))
     i += 1
 
 #Print number of connected components in the graph
