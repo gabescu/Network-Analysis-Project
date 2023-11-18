@@ -61,8 +61,8 @@ start_time = time.time()
 while i < steps:
     attack_nodes()
     darkweb_undirected = darkweb.to_undirected()
-    largest_cc = max(nx.connected_components(darkweb_undirected), key=len)
-    print("The largest is: " + str(len(largest_cc)))
+    largest_cc = round(len(max(nx.connected_components(darkweb_undirected), key=len)) / len(darkweb.nodes) * 100, 3)  
+    print(f"The largest connected component has {str(largest_cc)}% of the nodes in it")
     i += 1
 
 end_time = time.time()
