@@ -38,11 +38,6 @@ def max_pagerank(graph):
     max_p = max(pagerank.items(), key=operator.itemgetter(1))[0]
     return max_p
 
-#Function that removes the max degree node
-def attack_nodes():
-    node_to_remove = max_pagerank(darkweb)
-    darkweb.remove_node(node_to_remove)
-
 def max_closeness_centrality(graph):
     closeness = nx.closeness_centrality(graph)
     max_c = max(closeness.items(), key=operator.itemgetter(1))[0]
@@ -51,6 +46,11 @@ def max_closeness_centrality(graph):
 def attack_nodes_closeness():
     max_centrality_node = max_closeness_centrality(darkweb)
     darkweb.remove_node(max_centrality_node)
+
+#Function that removes the max degree node
+def attack_nodes():
+    node_to_remove = max_betweenness_centrality(darkweb)
+    darkweb.remove_node(node_to_remove)
 
 #Loop functions by steps times
 print("Please select number of steps:")
@@ -65,6 +65,6 @@ while i < steps:
     print("The largest is: " + str(len(largest_cc)))
     i += 1
 
+end_time = time.time()
 #Print number of connected components in the graph
-print(nx.number_connected_components(darkweb_undirected))
-    
+print(nx.number_connected_components(darkweb_undirected), f"Total time of execution is {round(end_time - start_time, 3)} seconds")
