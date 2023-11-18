@@ -26,15 +26,21 @@ def max_betweenness_centrality(graph):
     max_b = max(betweenness.items(), key=operator.itemgetter(1))[0]
     return max_b
 
+#Function that returnes the node with maximum degree
+def degree_attack(graph):
+    max_degree = max(dict(darkweb.out_degree()).values())
+    max_degree_node = list(dict(darkweb.out_degree()).keys())[max_degree]
+    return max_degree_node
+
 #Function that returns the node with maximum pagerank value
 def max_pagerank(graph):
     pagerank = nx.pagerank(graph, max_iter = 7000, weight = "weight")
     max_p = max(pagerank.items(), key=operator.itemgetter(1))[0]
     return max_p
 
-#Function that removes the interest node
+#Function that removes the max degree node
 def attack_nodes():
-    max_centrality_node = max_pagerank(darkweb)
+    max_centrality_node = max_betweenness_centrality(darkweb)
     darkweb.remove_node(max_centrality_node)
 
 #Loop functions by steps times
