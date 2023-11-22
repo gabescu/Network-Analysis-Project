@@ -69,6 +69,93 @@ def attack_nodes(graph):
     node_to_remove = weighted_node(graph)
     darkweb.remove_node(node_to_remove)
 
+#Function that makes a subgraph starting from a specified number of nodes, that covers at most a specified percentage of the original graph
+def make_subgraph(G, n_nodes=1, p=20, debug=False):
+
+    nodes = list(G.nodes)
+    N = len(nodes)
+    subgraph_nodes = []
+    if debug:
+        print(f"Making subgraph starting from {n_nodes} nodes, taking {p}% of the total nodes from their neighbourhood")
+
+    for node in range(n_nodes):
+
+        if debug:
+            print(f"---Iteration  = {node}")
+        n_count = 0
+        start_node = random.choice(nodes)
+        if debug:
+            print(f"Starting at node: {start_node}")
+        subgraph_nodes.append(start_node)
+        curr_node = start_node
+        curr_neighbors = list(G.neighbors(curr_node))
+        if debug:
+            print(f"Neighbours of starting node: {curr_neighbors}")
+        idx = 0
+
+        while n_count < (p/100 * N):
+
+            if idx == len(subgraph_nodes) and curr_neighbors in subgraph_nodes:
+                if debug:
+                    print(f"There are no more edges to follow, stopping")
+                break
+
+            if len(curr_neighbors) == 0:
+                if debug:
+                    print(f"Current node is dangling")
+                if idx + 1 >= len(subgraph_nodes):
+                    if debug:
+                        print(f"There are no more edges to follow, stopping")
+                    break
+
+                idx += 1
+                if debug:
+                    print(f"Taking node at idx {idx}")
+                curr_node = subgraph_nodes[idx]
+                curr_neighbors = list(G.neighbors(curr_node))
+                if debug:
+                    print(f"Curr node = {curr_node}, neighbors: ")
+                    print(curr_neighbors)
+                continue
+
+            for neighbor in curr_neighbors:
+                
+                if neighbor not in subgraph_nodes:
+                    subgraph_nodes.append(neighbor)
+                    n_count += 1
+
+                if n_count >= (p/100 * N):
+                    break
+            
+            if debug:
+                print(f"Added current neighbors, new subgraph nodes list is")
+                print(subgraph_nodes)
+            
+            if idx >= len(subgraph_nodes):
+                if debug:
+                    print(f"There are no more edges to follow, stopping")
+                break
+
+            curr_node = subgraph_nodes[idx]
+            idx += 1
+            if debug:
+                print(f"Taking node at idx {idx}")
+            curr_neighbors = list(G.neighbors(curr_node))
+            if idx == len(subgraph_nodes) and curr_neighbors in subgraph_nodes:
+                if debug:
+                    print(f"There are no more edges to follow, stopping")
+                break
+            if debug:
+                print(f"Curr node = {curr_node}, neighbors: ")
+                print(curr_neighbors)
+
+    G_subgraph = G.subgraph(subgraph_nodes)
+    if debug:
+        print(f"Final node list:")
+        print(subgraph_nodes)
+        print(f"Made a subgraph with {len(G_subgraph)} nodes")
+    return G_subgraph
+
 #Loop functions by steps times
 print("Please select number of steps:")
 steps = int(input())
