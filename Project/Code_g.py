@@ -44,7 +44,7 @@ def max_closeness_centrality(graph):
     return max_c
 
 def eigenvector_centrality(graph):
-    eigenvector = nx.eigenvector_centrality(graph)
+    eigenvector = nx.eigenvector_centrality(graph, max_iter=7000)
     max_e = max(eigenvector.items(), key=operator.itemgetter(1))[0]
     return max_e
 
@@ -63,10 +63,9 @@ def weighted_node(graph):
             max_node = node
     return max_node
     
-
 #Function that removes the max degree node
 def attack_nodes(graph):
-    node_to_remove = weighted_node(graph)
+    node_to_remove = degree_attack(graph)
     darkweb.remove_node(node_to_remove)
 
 #Loop functions by steps times
@@ -74,13 +73,25 @@ print("Please select number of steps:")
 steps = int(input())
 darkweb_undirected = darkweb.to_undirected()
 i = 0
+x_plots = []
+y_plots = []
 start_time = time.time()
-while i < steps:
+current_time = 0
+while i < steps and current_time - start_time < 300:
     attack_nodes(darkweb)
     darkweb_undirected = darkweb.to_undirected()
     largest_cc = round(len(max(nx.connected_components(darkweb_undirected), key=len)) / len(darkweb.nodes) * 100, 3)  
     print(f"The largest connected component has {str(largest_cc)}% of the nodes in it")
     i += 1
+    current_time = time.time()
+    y_plots.append(largest_cc)
+    x_plots.append(current_time - start_time)
+    
+plt.plot(x_plots, y_plots)
+plt.title("Degree Attack")
+plt.ylabel("Quality Mesurement")
+plt.xlabel("Time elapsed")
+plt.show()
 
 end_time = time.time()
 #Print number of connected components in the graph
