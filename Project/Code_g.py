@@ -68,10 +68,6 @@ def weighted_node(graph):
 def attack_nodes(graph):
     node_to_remove = weighted_node(graph)
     darkweb.remove_node(node_to_remove)
-    
-def attack_cluster(graph):
-    node_to_remove = weighted_node(graph)
-    darkweb.remove_node(node_to_remove)
 
 #Loop functions by steps times
 print("Please select number of steps:")
