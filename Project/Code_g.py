@@ -79,8 +79,6 @@ def weighted_node(graph):
             max_node = node
     return max_node
     
-
-#Function that removes the max degree node
 def attack_nodes(mode, darkweb2):
     if mode == 0:
         node_to_remove = max_betweenness_centrality(darkweb2)
