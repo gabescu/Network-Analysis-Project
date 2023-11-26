@@ -70,6 +70,7 @@ def nodes_closeness(graph):
 
 def weighted_node(graph):
     max_sum = 0
+    check = False
     for node in graph.nodes:
         weight_sum = 0
         for neighbor in graph.neighbors(node):
@@ -77,6 +78,10 @@ def weighted_node(graph):
         if weight_sum >= max_sum:
             max_sum = weight_sum
             max_node = node
+            check = True
+    if check == False:
+        #print("Network already broken")
+        return -1
     return max_node
     
 def attack_nodes(mode, darkweb2):
@@ -182,6 +187,35 @@ def make_subgraph(G, n_nodes=1, p=20, debug=False, seed=None):
         print(subgraph_nodes)
         print(f"Made a subgraph with {len(G_subgraph)} nodes")
     return G_subgraph
+
+#Function to test splitting the node attacking only nodes in the subgraph
+def test_subgraph(n, iter, darkweb2):
+
+    #n = number of nodes to delete on each attack
+    #iter = number of iterations to test for
+    #OUTPUT FORMAT: list of tuples, where each tuple contains the percentage of the graph described by the largest connected component and the
+    #number of connected components after the attack on that iteration
+    delete_nodes = n
+    data = []
+    for i in range(iter):
+        darkweb = darkweb2.copy() #reset graph on each iteration
+        try:
+            subgraph = make_subgraph(darkweb, 5, 10, False)
+            #print(f"Subgraph has {len(subgraph)} nodes")
+            for _ in range(delete_nodes):
+                node_to_remove = weighted_node(subgraph)
+                if node_to_remove == -1: #-1 is returned if a node with max weight can't be found, case in which we stop
+                    break
+                darkweb.remove_node(node_to_remove)
+
+            darkweb_undirected = darkweb.to_undirected()
+            largest_cc = round(len(max(nx.connected_components(darkweb_undirected), key=len)) / len(darkweb.nodes) * 100, 3)
+            cc = len(max(nx.connected_components(darkweb_undirected), key=len))
+            data.append((largest_cc, cc))
+            #print(f"ITER {i}: {delete_nodes} iterations of weighted node attack | Split in {cc} components | largest componenent : {largest_cc}% of the network")
+        except:
+            print(f"Error at iteration {i}")
+    return data
 
 #Loop functions by steps times
 # print("Please select number of steps:")
