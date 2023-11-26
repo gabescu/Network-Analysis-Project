@@ -96,8 +96,9 @@ def attack_nodes(mode, darkweb2):
 
 
 #Function that makes a subgraph starting from a specified number of nodes, that covers at most a specified percentage of the original graph
-def make_subgraph(G, n_nodes=1, p=20, debug=False):
-
+def make_subgraph(G, n_nodes=1, p=20, debug=False, seed=None):
+    #Note: params for >10% of graph covered: n_nodes=5, p=10, seed=4
+    random.seed(seed)
     nodes = list(G.nodes)
     N = len(nodes)
     subgraph_nodes = []
