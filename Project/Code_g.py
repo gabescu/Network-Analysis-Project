@@ -183,6 +183,19 @@ def make_subgraph(G, n_nodes=1, p=20, debug=False, seed=None):
         print(f"Made a subgraph with {len(G_subgraph)} nodes")
     return G_subgraph
 
+#Function to test splitting the node attacking only nodes in the subgraph
+def test_subgraph(n, darkweb):
+    delete_nodes = n
+    subgraph = make_subgraph(darkweb, 5, 10, False, 4)
+    for _ in range(delete_nodes):
+        node_to_remove = weighted_node(subgraph)
+        darkweb.remove_node(node_to_remove)
+
+    darkweb_undirected = darkweb.to_undirected()
+    largest_cc = round(len(max(nx.connected_components(darkweb_undirected), key=len)) / len(darkweb.nodes) * 100, 3)
+    cc = len(max(nx.connected_components(darkweb_undirected), key=len))
+    print(f"{delete_nodes} iterations of weighted node attack: Split in {cc} components, largest componenent represents {largest_cc}% of the network")
+
 #Loop functions by steps times
 # print("Please select number of steps:")
 # steps = int(input())
