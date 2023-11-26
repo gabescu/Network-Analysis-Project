@@ -194,7 +194,7 @@ for _ in range(6):
     i = 0
     start_time = time.time()
     mid_time = start_time
-    while i < 800 and mid_time-start_time < 180:
+    while i < 800 and mid_time-start_time < 300:
         attack_nodes(_, darkweb2)
         mid_time = time.time()
         i += 1
@@ -208,13 +208,14 @@ for _ in range(6):
     # yList.append(yList2)
     print("And " + str(round(mid_time-start_time)) + " seconds.")
     # xList.append(xList2)
-    plt.plot(xList2, yList2, label = "id %s"%_)
+    plt.plot(xList2, yList2, label = f"id {_}")
     
 
 plt.xlim([0,200])
 plt.xlabel("Time")
 plt.ylabel("Percentage")
 plt.title("Differences Between Attack Strategies")
+plt.legend(loc = 'best')
 plt.show()
 end_time = time.time()
 #Print number of connected components in the graph
