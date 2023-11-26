@@ -26,50 +26,57 @@ xList = []
 
 #Function that returns the node with maximum betweenness centrality
 def max_betweenness_centrality(graph):
+    max_node = None
     betweenness = nx.betweenness_centrality(graph)
-    max_b = max(betweenness.items(), key=operator.itemgetter(1))[0]
-    return max_b
+    max_node = max(betweenness.items(), key=operator.itemgetter(1))[0]
+    if max_node:
+        return max_node
+    return None
 
 #Function that returns the node with maximum degree
 def degree_attack(graph):
+    max_node = None
     max_degree = max(dict(graph.out_degree()).values())
-    max_degree_node = list(dict(graph.out_degree()).keys())[max_degree]
-    return max_degree_node
+    max_node = list(dict(graph.out_degree()).keys())[max_degree]
+    if max_node:
+        return max_node
+    return None
 
 #Function that returns the node with maximum pagerank value
 def max_pagerank(graph):
+    max_node = None
     pagerank = nx.pagerank(graph, max_iter = 7000, weight = "weight")
-    max_p = max(pagerank.items(), key=operator.itemgetter(1))[0]
-    return max_p
+    max_node = max(pagerank.items(), key=operator.itemgetter(1))[0]
+    if max_node:
+        return max_node
+    return None
 
 def max_closeness_centrality(graph):
+    max_node = None
     closeness = nx.closeness_centrality(graph)
-    max_c = max(closeness.items(), key=operator.itemgetter(1))[0]
-    return max_c
-
-#Function that returns the node with most weights
-def weighted_node(graph):
-    max_sum = 0
-    for node in graph.nodes:
-        weight_sum = 0
-        for neighbor in graph.neighbors(node):
-            weight_sum += graph[node][neighbor]["weight"]
-        if weight_sum >= max_sum:
-            max_sum = weight_sum
-            max_node = node
-    return max_node
+    max_node = max(closeness.items(), key=operator.itemgetter(1))[0]
+    if max_node:
+        return max_node
+    return None
 
 def eigenvector_centrality(graph):
+    max_node = None
     eigenvector = nx.eigenvector_centrality(graph, max_iter=7000)
-    max_e = max(eigenvector.items(), key=operator.itemgetter(1))[0]
-    return max_e
+    max_node = max(eigenvector.items(), key=operator.itemgetter(1))[0]
+    if max_node:
+        return max_node
+    return None
 
 def nodes_closeness(graph):
-    max_centrality_node = max_closeness_centrality(graph)
-    return max_centrality_node
+    max_node = None
+    max_node = max_closeness_centrality(graph)
+    if max_node:
+        return max_node
+    return None
 
 def weighted_node(graph):
     max_sum = 0
+    max_node = None
     for node in graph.nodes:
         weight_sum = 0
         for neighbor in graph.neighbors(node):
@@ -77,26 +84,58 @@ def weighted_node(graph):
         if weight_sum >= max_sum:
             max_sum = weight_sum
             max_node = node
-    return max_node
+    if max_node:
+        return max_node
+    return None
     
-def attack_nodes(mode, darkweb2):
+def attack_nodes(mode, darkweb2, subgraph):
     if mode == 0:
-        node_to_remove = max_betweenness_centrality(darkweb2)
+        node_to_remove = max_betweenness_centrality(subgraph)
     elif mode == 1:
-        node_to_remove = degree_attack(darkweb2)
+        node_to_remove = degree_attack(subgraph)
     elif mode == 2:
-        node_to_remove = max_pagerank(darkweb2)
+        node_to_remove = max_pagerank(subgraph)
     elif mode == 3:
-        node_to_remove = max_closeness_centrality(darkweb2)
+        node_to_remove = max_closeness_centrality(subgraph)
     elif mode == 4:
-        node_to_remove = eigenvector_centrality(darkweb2)
+        node_to_remove = eigenvector_centrality(subgraph)
     elif mode == 5:
-        node_to_remove = weighted_node(darkweb2)
-    darkweb2.remove_node(node_to_remove)
+        node_to_remove = weighted_node(subgraph)
+    if node_to_remove:
+        darkweb2.remove_node(node_to_remove)
+        subgraph.remove_node(node_to_remove)
+        return 1
+    return 0
 
+
+def weighted_neighbor(graph, node, node_list):
+    neighbor = None
+    max_weight = 0
+    for nb in graph.neighbors(node):
+        if nb not in node_list:
+            if graph[node][nb]["weight"] > max_weight:
+                max_weight = graph[node][nb]["weight"]
+                neighbor = nb
+    if neighbor:
+        return neighbor
+    else:
+        nodes = list(graph.neighbors(node))
+        random_nb = random.choice(nodes)
+        return random_nb
+
+def weighted_subgraph(graph):
+    nodes = list(graph.nodes)
+    random_node = random.choice(nodes)
+    subgraph_nodes = [random_node]
+    while len(subgraph_nodes)/len(nodes) < 0.10:
+        random_node = weighted_neighbor(graph, random_node, subgraph_nodes)
+        if random_node not in subgraph_nodes:
+            subgraph_nodes.append(random_node)
+    subgraph = graph.subgraph(subgraph_nodes)
+    return subgraph
 
 #Function that makes a subgraph starting from a specified number of nodes, that covers at most a specified percentage of the original graph
-def make_subgraph(G, n_nodes=1, p=20, debug=False, seed=None):
+def make_subgraph(G, n_nodes=5, p=10, debug=False, seed=4):
     #Note: params for >10% of graph covered: n_nodes=5, p=10, seed=4
     random.seed(seed)
     nodes = list(G.nodes)
@@ -186,32 +225,35 @@ def make_subgraph(G, n_nodes=1, p=20, debug=False, seed=None):
 #Loop functions by steps times
 # print("Please select number of steps:")
 # steps = int(input())
-for _ in range(6):
+
+for _ in range(10):
     xList2 = []
     yList2 = []
     darkweb2 = darkweb.copy()
+    DarkSubgraph = weighted_subgraph(darkweb2.to_undirected()).copy()
     i = 0
     start_time = time.time()
     mid_time = start_time
-    while i < 800 and mid_time-start_time < 300:
-        attack_nodes(_, darkweb2)
+    ok = 1
+    while i < 300 and mid_time-start_time < 300 and ok:
+        ok = attack_nodes(5, darkweb2, DarkSubgraph)
         mid_time = time.time()
         i += 1
         darkweb_undirected = darkweb2.to_undirected()
         largest_cc = round(len(max(nx.connected_components(darkweb_undirected), key=len)) / len(darkweb2.nodes) * 100, 3)
         yList2.append(largest_cc)
-        xList2.append(round(mid_time-start_time))
+        xList2.append(i)
     print(f"The largest connected component has {str(largest_cc)}% of the nodes in it")
     print(_)
     print("It took " + str(i) + " steps.")
     # yList.append(yList2)
     print("And " + str(round(mid_time-start_time)) + " seconds.")
     # xList.append(xList2)
-    plt.plot(xList2, yList2, label = f"id {_}")
+    plt.plot(xList2, yList2, label = f"Seed {_}")
     
 
-plt.xlim([0,200])
-plt.xlabel("Time")
+plt.xlim([0,300])
+plt.xlabel("Steps")
 plt.ylabel("Percentage")
 plt.title("Differences Between Attack Strategies")
 plt.legend(loc = 'best')
