@@ -6,7 +6,7 @@ import operator
 import time
 
 
-#Reading
+# Reading
 inp = open("darkweb-edges.csv")
 edges = []
 for row in inp:
@@ -15,16 +15,16 @@ for row in inp:
     edges.append(edge)
 inp.close()
 
-#Creating the Directed Graphs
+# Creating the Directed Graphs
 darkweb = nx.DiGraph()
 darkweb.add_weighted_edges_from(edges)
 nr_nodes = len(darkweb.nodes)
 
-#Lists for the plot
+# Lists for the plot
 yList = []
 xList = []
 
-#Function that returns the node with maximum betweenness centrality
+# Function that returns the node with maximum betweenness centrality
 def max_betweenness_centrality(graph):
     max_node = None
     betweenness = nx.betweenness_centrality(graph)
@@ -33,7 +33,7 @@ def max_betweenness_centrality(graph):
         return max_node
     return None
 
-#Function that returns the node with maximum degree
+# Function that returns the node with maximum degree
 def degree_attack(graph):
     max_node = None
     max_degree = max(dict(graph.out_degree()).values())
@@ -42,7 +42,7 @@ def degree_attack(graph):
         return max_node
     return None
 
-#Function that returns the node with maximum pagerank value
+# Function that returns the node with maximum pagerank value
 def max_pagerank(graph):
     max_node = None
     pagerank = nx.pagerank(graph, max_iter = 7000, weight = "weight")
@@ -222,7 +222,36 @@ def make_subgraph(G, n_nodes=5, p=10, debug=False, seed=4):
         print(f"Made a subgraph with {len(G_subgraph)} nodes")
     return G_subgraph
 
-#Loop functions by steps times
+#Function to test splitting the node attacking only nodes in the subgraph
+def test_subgraph(n, iter, darkweb2):
+
+    #n = number of nodes to delete on each attack
+    #iter = number of iterations to test for
+    #OUTPUT FORMAT: list of tuples, where each tuple contains the percentage of the graph described by the largest connected component and the
+    #number of connected components after the attack on that iteration
+    delete_nodes = n
+    data = []
+    for i in range(iter):
+        darkweb = darkweb2.copy() #reset graph on each iteration
+        try:
+            subgraph = make_subgraph(darkweb, 5, 10, False)
+            #print(f"Subgraph has {len(subgraph)} nodes")
+            for _ in range(delete_nodes):
+                node_to_remove = weighted_node(subgraph)
+                if node_to_remove == -1: #-1 is returned if a node with max weight can't be found, case in which we stop
+                    break
+                darkweb.remove_node(node_to_remove)
+
+            darkweb_undirected = darkweb.to_undirected()
+            largest_cc = round(len(max(nx.connected_components(darkweb_undirected), key=len)) / len(darkweb.nodes) * 100, 3)
+            cc = len(max(nx.connected_components(darkweb_undirected), key=len))
+            data.append((largest_cc, cc))
+            #print(f"ITER {i}: {delete_nodes} iterations of weighted node attack | Split in {cc} components | largest componenent : {largest_cc}% of the network")
+        except:
+            print(f"Error at iteration {i}")
+    return data
+
+# Loop functions by steps times
 # print("Please select number of steps:")
 # steps = int(input())
 
@@ -259,5 +288,5 @@ plt.title("Differences Between Attack Strategies")
 plt.legend(loc = 'best')
 plt.show()
 end_time = time.time()
-#Print number of connected components in the graph
+# Print number of connected components in the graph
 print(nx.number_connected_components(darkweb_undirected), f"Total time of execution is {round(end_time - start_time, 3)} seconds")
