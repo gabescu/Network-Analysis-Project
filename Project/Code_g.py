@@ -6,7 +6,7 @@ import operator
 import time
 
 
-#Reading
+# Reading
 inp = open("darkweb-edges.csv")
 edges = []
 for row in inp:
@@ -15,28 +15,28 @@ for row in inp:
     edges.append(edge)
 inp.close()
 
-#Creating the Directed Graphs
+# Creating the Directed Graphs
 darkweb = nx.DiGraph()
 darkweb.add_weighted_edges_from(edges)
 nr_nodes = len(darkweb.nodes)
 
-#Lists for the plot
+# Lists for the plot
 yList = []
 xList = []
 
-#Function that returns the node with maximum betweenness centrality
+# Function that returns the node with maximum betweenness centrality
 def max_betweenness_centrality(graph):
     betweenness = nx.betweenness_centrality(graph)
     max_b = max(betweenness.items(), key=operator.itemgetter(1))[0]
     return max_b
 
-#Function that returns the node with maximum degree
+# Function that returns the node with maximum degree
 def degree_attack(graph):
     max_degree = max(dict(graph.out_degree()).values())
     max_degree_node = list(dict(graph.out_degree()).keys())[max_degree]
     return max_degree_node
 
-#Function that returns the node with maximum pagerank value
+# Function that returns the node with maximum pagerank value
 def max_pagerank(graph):
     pagerank = nx.pagerank(graph, max_iter = 7000, weight = "weight")
     max_p = max(pagerank.items(), key=operator.itemgetter(1))[0]
@@ -46,18 +46,6 @@ def max_closeness_centrality(graph):
     closeness = nx.closeness_centrality(graph)
     max_c = max(closeness.items(), key=operator.itemgetter(1))[0]
     return max_c
-
-#Function that returns the node with most weights
-def weighted_node(graph):
-    max_sum = 0
-    for node in graph.nodes:
-        weight_sum = 0
-        for neighbor in graph.neighbors(node):
-            weight_sum += graph[node][neighbor]["weight"]
-        if weight_sum >= max_sum:
-            max_sum = weight_sum
-            max_node = node
-    return max_node
 
 def eigenvector_centrality(graph):
     eigenvector = nx.eigenvector_centrality(graph, max_iter=7000)
@@ -100,9 +88,9 @@ def attack_nodes(mode, darkweb2):
     darkweb2.remove_node(node_to_remove)
 
 
-#Function that makes a subgraph starting from a specified number of nodes, that covers at most a specified percentage of the original graph
+# Function that makes a subgraph starting from a specified number of nodes, that covers at most a specified percentage of the original graph
 def make_subgraph(G, n_nodes=1, p=20, debug=False, seed=None):
-    #Note: params for >10% of graph covered: n_nodes=5, p=10, seed=4
+    # Note: params for >10% of graph covered: n_nodes=5, p=10, seed=4
     random.seed(seed)
     nodes = list(G.nodes)
     N = len(nodes)
@@ -217,7 +205,7 @@ def test_subgraph(n, iter, darkweb2):
             print(f"Error at iteration {i}")
     return data
 
-#Loop functions by steps times
+# Loop functions by steps times
 # print("Please select number of steps:")
 # steps = int(input())
 for _ in range(6):
@@ -234,7 +222,7 @@ for _ in range(6):
         darkweb_undirected = darkweb2.to_undirected()
         largest_cc = round(len(max(nx.connected_components(darkweb_undirected), key=len)) / len(darkweb2.nodes) * 100, 3)
         yList2.append(largest_cc)
-        xList2.append(round(mid_time-start_time))
+        xList2.append(i)
     print(f"The largest connected component has {str(largest_cc)}% of the nodes in it")
     print(_)
     print("It took " + str(i) + " steps.")
@@ -245,11 +233,11 @@ for _ in range(6):
     
 
 plt.xlim([0,200])
-plt.xlabel("Time")
+plt.xlabel("Steps")
 plt.ylabel("Percentage")
 plt.title("Differences Between Attack Strategies")
 plt.legend(loc = 'best')
 plt.show()
 end_time = time.time()
-#Print number of connected components in the graph
+# Print number of connected components in the graph
 print(nx.number_connected_components(darkweb_undirected), f"Total time of execution is {round(end_time - start_time, 3)} seconds")
