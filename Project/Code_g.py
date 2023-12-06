@@ -102,24 +102,25 @@ def attack_nodes_subgraph(mode, darkweb2, subgraph):
     elif mode == 5:
         node_to_remove = weighted_node(subgraph)
     if node_to_remove:
+        if mode == 0:
+            prev = round(len(max(nx.connected_components(darkweb2.to_undirected()), key=len)) / len(darkweb2.nodes) * 100, 3)
         darkweb2.remove_node(node_to_remove)
+        if mode == 0:
+            if round(len(max(nx.connected_components(darkweb2.to_undirected()), key=len)) / len(darkweb2.nodes) * 100, 3) < 50 and prev > 50:
+                print(node_to_remove)
         subgraph.remove_node(node_to_remove)
         return 1
     return 0
 
 def attack_nodes(mode, darkweb2):
     if mode == 0:
-        largest_cc = max(nx.connected_components(darkweb2.to_undirected()), key=len)
-        subgraph = darkweb2.subgraph(largest_cc)
-        node_to_remove = max_betweenness_centrality(subgraph)
+        node_to_remove = max_betweenness_centrality(darkweb2)
     elif mode == 1:
         node_to_remove = degree_attack(darkweb2)
     elif mode == 2:
         node_to_remove = max_pagerank(darkweb2)
     elif mode == 3:
-        largest_cc = max(nx.connected_components(darkweb2.to_undirected()), key=len)
-        subgraph = darkweb2.subgraph(largest_cc)
-        node_to_remove = max_closeness_centrality(subgraph)
+        node_to_remove = max_closeness_centrality(darkweb2)
     elif mode == 4:
         node_to_remove = eigenvector_centrality(darkweb2)
     elif mode == 5:
@@ -141,7 +142,8 @@ def weighted_neighbor(graph, node, node_list):
     if neighbor:
         return neighbor
     else:
-        nodes = list(graph.neighbors(node))
+        undir_graph = graph.to_undirected()
+        nodes = list(undir_graph.neighbors(node))
         random_nb = random.choice(nodes)
         return random_nb
 
@@ -167,7 +169,6 @@ def make_subgraph(G, n_nodes=5, p=10, debug=False, seed=4):
         print(f"Making subgraph starting from {n_nodes} nodes, taking {p}% of the total nodes from their neighbourhood")
 
     for node in range(n_nodes):
-
         if debug:
             print(f"---Iteration  = {node}")
         n_count = 0
@@ -182,7 +183,6 @@ def make_subgraph(G, n_nodes=5, p=10, debug=False, seed=4):
         idx = 0
 
         while n_count < (p/100 * N):
-
             if idx == len(subgraph_nodes) and curr_neighbors in subgraph_nodes:
                 if debug:
                     print(f"There are no more edges to follow, stopping")
@@ -295,13 +295,15 @@ for _ in range(6):
     xList2 = []
     yList2 = []
     darkweb2 = darkweb.copy()
-    DarkSubgraph = weighted_subgraph(darkweb2.to_undirected()).copy()
+    DarkSubgraph = weighted_subgraph(darkweb2).copy()
+    if(_ == 5):
+        DarkSubgraph = DarkSubgraph.to_undirected()
     i = 0
     start_time = time.time()
     mid_time = start_time
     ok = 1
-    while i < 800 and mid_time-start_time < 300 and ok:
-        ok = attack_nodes(_, darkweb2)
+    while i < 300 and mid_time-start_time < 300 and ok:
+        ok = attack_nodes_subgraph(_, darkweb2, DarkSubgraph)
         mid_time = time.time()
         i += 1
         darkweb_undirected = darkweb2.to_undirected()
@@ -319,10 +321,10 @@ for _ in range(6):
 
     
 
-plt.xlim([0,800])
+plt.xlim([0,300])
 plt.xlabel("Steps")
 plt.ylabel("Percentage")
-plt.title("Differences Between Attack Strategies")
+plt.title("Differences Between Attack Strategies (Subgraph)")
 plt.legend(loc = 'best')
 plt.show()
 end_time = time.time()
