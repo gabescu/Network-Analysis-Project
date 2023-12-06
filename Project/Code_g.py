@@ -88,7 +88,7 @@ def weighted_node(graph):
         return max_node
     return None
     
-def attack_nodes(mode, darkweb2, subgraph):
+def attack_nodes_subgraph(mode, darkweb2, subgraph):
     if mode == 0:
         node_to_remove = max_betweenness_centrality(subgraph)
     elif mode == 1:
@@ -104,6 +104,28 @@ def attack_nodes(mode, darkweb2, subgraph):
     if node_to_remove:
         darkweb2.remove_node(node_to_remove)
         subgraph.remove_node(node_to_remove)
+        return 1
+    return 0
+
+def attack_nodes(mode, darkweb2):
+    if mode == 0:
+        largest_cc = max(nx.connected_components(darkweb2.to_undirected()), key=len)
+        subgraph = darkweb2.subgraph(largest_cc)
+        node_to_remove = max_betweenness_centrality(subgraph)
+    elif mode == 1:
+        node_to_remove = degree_attack(darkweb2)
+    elif mode == 2:
+        node_to_remove = max_pagerank(darkweb2)
+    elif mode == 3:
+        largest_cc = max(nx.connected_components(darkweb2.to_undirected()), key=len)
+        subgraph = darkweb2.subgraph(largest_cc)
+        node_to_remove = max_closeness_centrality(subgraph)
+    elif mode == 4:
+        node_to_remove = eigenvector_centrality(darkweb2)
+    elif mode == 5:
+        node_to_remove = weighted_node(darkweb2)
+    if node_to_remove:
+        darkweb2.remove_node(node_to_remove)
         return 1
     return 0
 
@@ -255,7 +277,21 @@ def test_subgraph(n, iter, darkweb2):
 # print("Please select number of steps:")
 # steps = int(input())
 
-for _ in range(10):
+def print_method(number):
+    if number == 0:
+        return "Betweenness Centrality"
+    elif number == 1:
+        return "Max Degree"
+    elif number == 2:
+        return "Pagerank"
+    elif number == 3:
+        return "Closeness Centrality"
+    elif number == 4:
+        return "Eigenvector Centrality"
+    elif number == 5:
+        return "Weighted Node"
+
+for _ in range(6):
     xList2 = []
     yList2 = []
     darkweb2 = darkweb.copy()
@@ -264,8 +300,8 @@ for _ in range(10):
     start_time = time.time()
     mid_time = start_time
     ok = 1
-    while i < 300 and mid_time-start_time < 300 and ok:
-        ok = attack_nodes(5, darkweb2, DarkSubgraph)
+    while i < 800 and mid_time-start_time < 300 and ok:
+        ok = attack_nodes(_, darkweb2)
         mid_time = time.time()
         i += 1
         darkweb_undirected = darkweb2.to_undirected()
@@ -273,15 +309,17 @@ for _ in range(10):
         yList2.append(largest_cc)
         xList2.append(i)
     print(f"The largest connected component has {str(largest_cc)}% of the nodes in it")
-    print(_)
+    print(print_method(_))
     print("It took " + str(i) + " steps.")
     # yList.append(yList2)
     print("And " + str(round(mid_time-start_time)) + " seconds.")
     # xList.append(xList2)
-    plt.plot(xList2, yList2, label = f"Seed {_}")
+    plt.plot(xList2, yList2, label = print_method(_))
+
+
     
 
-plt.xlim([0,300])
+plt.xlim([0,800])
 plt.xlabel("Steps")
 plt.ylabel("Percentage")
 plt.title("Differences Between Attack Strategies")
